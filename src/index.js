@@ -9,7 +9,7 @@ import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 const Root = () => (
   <Router>
     <Switch>
-      <Route path="/" Component={App} />
+      <Route path="/" component={App} />
     </Switch>
   </Router>);
 
