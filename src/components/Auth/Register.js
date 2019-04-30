@@ -10,6 +10,7 @@ import {
 } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 import firebase from "../../firebase";
+import md5 from "md5";
 
 class Register extends Component {
   state = {
@@ -18,7 +19,8 @@ class Register extends Component {
     password: "",
     passwordConfirmation: "",
     errors: [],
-    loading: false
+    loading: false,
+    userRef: firebase.database().ref('users')
   };
 
   handleChange = event => {
@@ -70,7 +72,25 @@ class Register extends Component {
       .createUserWithEmailAndPassword(this.state.email, this.state.password)
       .then(createdUser => {
         console.log(createdUser);
-        this.setState({ loading: false });
+        createdUser.user
+          .updateProfile({
+            displayname: this.state.username,
+            photoURL: `http://gravatar.com/avatar/${md5(
+              createdUser.user.email
+            )}?d=identicon`
+          })
+          .then(() => {
+            this.saveUser(createdUser).then(() => {
+              this.setState({ loading: false });
+            });
+          })
+          .catch(err => {
+            console.error(error);
+            this.setState({
+              loading: false,
+              errors: this.state.errors.concat(err)
+            });
+          });
       })
       .catch(error => {
         console.error(error);
@@ -88,6 +108,10 @@ class Register extends Component {
     errors.some(error => error.message.toLowerCase().includes(name))
       ? "error"
       : "";
+
+  saveUser = createdUser => {
+  return this.state.userRef.child(createdUser.user.uid)
+  };
 
   render() {
     const {
