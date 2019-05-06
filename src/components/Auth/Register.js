@@ -39,9 +39,16 @@ class Register extends Component {
   };
 
   isPasswordValid = ({ password, passwordConfirmation }) => {
-    if (password.length < 6 || passwordConfirmation.length < 6) return false;
+    if (password.length > 3 || passwordConfirmation.length > 3) return false;
     else if (password !== passwordConfirmation) return false;
     else return true;
+  };
+
+  setErrorState = errors => {
+    this.setState({
+      errors: errors,
+      loading: false
+    })
   };
 
   isFormValid = () => {
@@ -50,12 +57,12 @@ class Register extends Component {
     if (this.isFormEmpty(this.state)) {
       //Throw error
       error = { message: "Fill in all fields" };
-      this.setState({ errors: errors.concat(error) });
+      this.setErrorState({ errors: errors.concat(error) });
       return false;
     } else if (this.isPasswordValid(this.state)) {
       //Throw error
       error = { message: "Password is invalid" };
-      this.setState({ errors: errors.concat(error) });
+      this.setErrorState({ errors: errors.concat(error) });
       return false;
     } else {
       //form valid
@@ -85,7 +92,7 @@ class Register extends Component {
             });
           })
           .catch(err => {
-            console.error(error);
+            console.error(err);
             this.setState({
               loading: false,
               errors: this.state.errors.concat(err)
@@ -110,7 +117,10 @@ class Register extends Component {
       : "";
 
   saveUser = createdUser => {
-  return this.state.userRef.child(createdUser.user.uid)
+  return this.state.userRef.child(createdUser.user.uid).set({
+    name: createdUser.user.displayName,
+    avatar: createdUser.user.photoURL
+  });
   };
 
   render() {
@@ -141,7 +151,7 @@ class Register extends Component {
                 placeholder="UserName"
                 onChange={this.handleChange}
                 type="text"
-                className={this.handleInputErrorFunction("username")}
+                className={this.handleInputErrorFunction(errors,"username")}
               />
 
               <Form.Input
@@ -153,7 +163,7 @@ class Register extends Component {
                 placeholder="email address"
                 onChange={this.handleChange}
                 type="email"
-                className={this.handleInputErrorFunction("email")}
+                className={this.handleInputErrorFunction(errors,"email")}
               />
 
               <Form.Input
@@ -165,7 +175,7 @@ class Register extends Component {
                 placeholder="Password"
                 onChange={this.handleChange}
                 type="password"
-                className={this.handleInputErrorFunction("password")}
+                className={this.handleInputErrorFunction(errors,"password")}
               />
 
               <Form.Input
@@ -177,7 +187,7 @@ class Register extends Component {
                 placeholder="Password Confirmation"
                 onChange={this.handleChange}
                 type="password"
-                className={this.handleInputErrorFunction("password")}
+                className={this.handleInputErrorFunction(errors,"password")}
               />
 
               <Button
