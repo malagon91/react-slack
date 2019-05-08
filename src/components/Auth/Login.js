@@ -48,17 +48,12 @@ class Login extends Component {
       })
       .catch(err => {
         console.log(err);
-        this.setErrorState({ errors: this.state.errors.concat(err) });
+        this.setErrorState([err]);
       });
   };
 
   displayErrors = errors =>
     errors.map((error, index) => <p key={index}>{error.message}</p>);
-  /*Valid if there is something on errors with the email word and change the class*/
-  handleInputErrorFunction = (errors, name) =>
-    errors.some(error => error.message.toLowerCase().includes(name))
-      ? "error"
-      : "";
 
   render() {
     const { email, password, errors, loading } = this.state;
@@ -81,7 +76,6 @@ class Login extends Component {
                 placeholder="email address"
                 onChange={this.handleChange}
                 type="email"
-                className={this.handleInputErrorFunction(errors, "email")}
               />
 
               <Form.Input
@@ -93,7 +87,6 @@ class Login extends Component {
                 placeholder="Password"
                 onChange={this.handleChange}
                 type="password"
-                className={this.handleInputErrorFunction(errors, "password")}
               />
 
               <Button
