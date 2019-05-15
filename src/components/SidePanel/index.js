@@ -12,7 +12,7 @@ class Index extends React.Component {
         vertical
         style={{ background: "#4c3c4c", fontSize: "1.2em" }}
       >
-        <UserPanel />
+        <UserPanel currentUser={this.props.currentUser} />
       </Menu>
     );
   }
