@@ -50,7 +50,6 @@ class UserPanel extends React.Component {
               <Icon name="code" />
               <Header.Content>DevChat</Header.Content>
             </Header>
-          </Grid.Row>
           <Header style={{ padding: "0.25em" }} inverted as="h4">
             <Dropdown
               trigger={
@@ -62,6 +61,8 @@ class UserPanel extends React.Component {
               options={this.dropdownOptions()}
             />
           </Header>
+          </Grid.Row>
+
         </Grid.Column>
       </Grid>
     );
