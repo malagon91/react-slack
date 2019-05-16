@@ -9,6 +9,11 @@ class Channels extends React.Component {
     channelDetail: ""
   };
 
+  handldeSubmit = () => {
+event.preventDefault();
+this
+  };
+
   closeModal = () => this.setState({ modal: false });
 
   openModal = () => this.setState({ modal: true });
