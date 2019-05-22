@@ -12,6 +12,15 @@ class Channels extends React.Component {
 		user: this.props.currentUser
 	};
 
+	componentDidMount() {
+		let loadedChannels = [];
+		//listener that exexutes every time that a channel is added
+		this.state.channelsRef.on('child_added', snap => {
+			loadedChannels.push(snap.val());
+			this.setState({ channels: loadedChannels });
+		});
+	}
+
 	addChannel = () => {
 		const { channelsRef, channelName, channelDetail, user } = this.state;
 
@@ -43,6 +52,19 @@ class Channels extends React.Component {
 			});
 	};
 
+	displayChannels = channels =>
+		channels.length > 0 &&
+		channels.map(channel => (
+			<Menu.Item
+				key={channel.id}
+				onClick={() => console.log('click')}
+				name={channel.name}
+				style={{ opacity: 0.7 }}
+			>
+				# {channel.name}
+			</Menu.Item>
+		));
+
 	handldeSubmit = () => {
 		if (this.isFormValid(this.state)) {
 			this.addChannel();
@@ -67,12 +89,11 @@ class Channels extends React.Component {
 			<React.Fragment>
 				<Menu.Menu style={{ paddingBottom: 'em' }}>
 					<Menu.Item>
-						<span>
-							<Icon nme="exchange" /> CHANNELS
-						</span>{' '}
-						({channels.length}) <Icon name="add" onClick={this.openModal} />
+						<span>CHANNELS</span> ({channels.length}){' '}
+						<Icon name="add" onClick={this.openModal} />
 					</Menu.Item>
 					{/*CHANNELS*/}
+					{this.displayChannels(channels)}
 				</Menu.Menu>
 				<Modal basic open={modal} onClose={this.closeModal}>
 					<Modal.Header>Add a Channel</Modal.Header>
