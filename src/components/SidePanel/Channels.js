@@ -1,5 +1,7 @@
 import React from 'react';
 import { Menu, Icon, Modal, Form, Input, Button } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+import { setCurrentChannel } from '../../actions';
 import firebase from '../../firebase';
 
 class Channels extends React.Component {
@@ -9,17 +11,40 @@ class Channels extends React.Component {
 		channelName: '',
 		channelDetail: '',
 		channelsRef: firebase.database().ref('channels'),
-		user: this.props.currentUser
+		user: this.props.currentUser,
+		firstLoad: true
 	};
 
 	componentDidMount() {
+		this.addListeners();
+	}
+
+	componentWillUnmount() {
+		this.removeListeners();
+	}
+
+	removeListeners = () => {
+		this.state.channelsRef.off(); // always turn off the firebase refs on project
+	};
+
+	addListeners = () => {
 		let loadedChannels = [];
 		//listener that exexutes every time that a channel is added
 		this.state.channelsRef.on('child_added', snap => {
 			loadedChannels.push(snap.val());
-			this.setState({ channels: loadedChannels });
+			this.setState({ channels: loadedChannels }, () => {
+				this.setFirstChannel();
+			});
 		});
-	}
+	};
+
+	setFirstChannel = () => {
+		if (this.state.firstLoad && this.state.channels.length > 0) {
+			const firstChannel = this.state.channels[0];
+			this.changeChannel(firstChannel);
+		}
+		this.setState({ firstLoad: false });
+	};
 
 	addChannel = () => {
 		const { channelsRef, channelName, channelDetail, user } = this.state;
@@ -57,19 +82,30 @@ class Channels extends React.Component {
 		channels.map(channel => (
 			<Menu.Item
 				key={channel.id}
-				onClick={() => console.log('click')}
+				onClick={() => this.changeChannel(channel)}
 				name={channel.name}
 				style={{ opacity: 0.7 }}
+				active={channel.id === this.state.activeChannel}
 			>
 				# {channel.name}
 			</Menu.Item>
 		));
+
+	changeChannel = channel => {
+		this.setActive(channel.id);
+		this.props.setCurrentChannel(channel);
+	};
+
+	setActive = channel => {
+		this.setState({ activeChannel: channel });
+	};
 
 	handldeSubmit = () => {
 		if (this.isFormValid(this.state)) {
 			this.addChannel();
 		}
 	};
+
 	isFormValid = ({ channelName, channelDetail }) =>
 		channelName && channelDetail;
 
@@ -131,4 +167,7 @@ class Channels extends React.Component {
 	}
 }
 
-export default Channels;
+export default connect(
+	null,
+	{ setCurrentChannel }
+)(Channels);
