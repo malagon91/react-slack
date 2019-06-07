@@ -12,9 +12,16 @@ class App extends Component {
 		return (
 			<Grid columns="equal" className="app" style={{ background: '#eee' }}>
 				<ColorPanel />
-				<SidePanel currentUser={this.props.currentUser} />
+				<SidePanel
+					key={this.props.currentUser}
+					currentUser={this.props.currentUser}
+				/>
 				<Grid.Column style={{ marginLeft: 320 }}>
-					<Messages />
+					<Messages
+						key={this.props.channel && this.props.channel.id}
+						currentChannel={this.props.channel}
+						currentUser={this.props.currentUser}
+					/>
 				</Grid.Column>
 				<Grid.Column width={4}>
 					<MetaPanel />
@@ -23,8 +30,9 @@ class App extends Component {
 		);
 	}
 }
-const mapStateToProps = ({ user }) => ({
-	currentUser: user.currentUser
+const mapStateToProps = ({ user, channel }) => ({
+	currentUser: user.currentUser,
+	channel: channel.currentChannel
 });
 
 export default connect(mapStateToProps)(App);
